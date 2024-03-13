@@ -1,10 +1,14 @@
 "use strict";
 
 const gameBoard = (function () {
-  const boardPlayer1 = [];
-  const boardPlayer2 = [];
+  const board = [[], []];
 
-  return { boardPlayer1, boardPlayer2 };
+  let clicks = 0;
+
+  let currentPlayer = 0;
+  let token = "O";
+
+  return { board, currentPlayer, token, clicks };
 })();
 
 let gameControlModule = (function () {
@@ -21,43 +25,57 @@ let gameControlModule = (function () {
     [2, 4, 6],
   ];
 
-  return { box, winningCondition };
+  function changePlayer() {
+    if (gameBoard.clicks === 0) return;
+
+    gameBoard.currentPlayer === 0
+      ? ((gameBoard.currentPlayer = 1), (gameBoard.token = "X"))
+      : ((gameBoard.currentPlayer = 0), (gameBoard.token = "O"));
+  }
+
+  function checkWin() {
+    for (let i = 0; i < gameControlModule.winningCondition.length; i++) {
+      if (
+        gameControlModule.winningCondition[i].every((x) =>
+          gameBoard.board[gameBoard.currentPlayer].includes(x)
+        )
+      ) {
+        console.log(`Player ${gameBoard.currentPlayer} win!`);
+        gameBoard.board = [[], []];
+        clear();
+      }
+    }
+  }
+
+  function clear() {
+    box.forEach((el) => (el.textContent = ""));
+    gameBoard.currentPlayer = 0;
+    gameBoard.clicks = 0;
+  }
+  return { box, winningCondition, checkWin, changePlayer, clear };
 })();
+
+gameControlModule.clear();
 
 const playerAction = (function () {
   gameControlModule.box.forEach((el) =>
     el.addEventListener("click", function () {
       if (
-        gameBoard.boardPlayer1.includes(Number(el.dataset.number)) ||
-        gameBoard.boardPlayer2.includes(Number(el.dataset.number))
+        gameBoard.board[0].includes(Number(el.dataset.number)) ||
+        gameBoard.board[1].includes(Number(el.dataset.number))
       )
         return;
 
-      gameControlModule.box[el.dataset.number].textContent = "X";
-      gameBoard.boardPlayer1.push(Number(el.dataset.number));
-      console.log(gameBoard.boardPlayer1);
-      dup();
+      gameControlModule.box[el.dataset.number].textContent = gameBoard.token;
+      gameBoard.board[gameBoard.currentPlayer].push(Number(el.dataset.number));
+      console.log(gameBoard.board[gameBoard.currentPlayer]);
+      gameControlModule.checkWin();
+      gameControlModule.changePlayer();
+      gameBoard.clicks++;
+      console.log(gameBoard.currentPlayer);
     })
   );
 })();
-
-function dup() {
-  for (let i = 0; i < gameControlModule.winningCondition.length; i++) {
-    if (
-      gameControlModule.winningCondition[i].every((x) =>
-        gameBoard.boardPlayer1.includes(x)
-      )
-    ) {
-      console.log("dup");
-      gameBoard.boardPlayer1 = [];
-      for (let i = 0; i < 9; i++) {
-        gameControlModule.box[i].textContent = i + 1;
-      }
-    }
-  }
-}
-
-// gameControlModule.box[3].textContent = "X";
 
 // const createPlayer = (playerName, playerNumber, playerSymbol) => {
 //   let getPlayerName = () => {
