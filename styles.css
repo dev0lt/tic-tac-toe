@@ -1,0 +1,29 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.wrapper {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grid_container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 2px;
+}
+
+.box {
+  width: 100px;
+  height: 100px;
+  border: 1px solid black;
+  border-radius: 2px;
+  background-color: rgb(255, 223, 172);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
