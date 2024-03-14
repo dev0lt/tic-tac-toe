@@ -1,14 +1,25 @@
 "use strict";
 
+const point = document.querySelectorAll(".point");
+const players = document.querySelectorAll(".player");
+
 const gameBoard = (function () {
   const board = [[], []];
+
+  let score = [0, 0];
 
   let clicks = 0;
 
   let currentPlayer = 0;
   let token = "O";
 
-  return { board, currentPlayer, token, clicks };
+  return {
+    board,
+    currentPlayer,
+    token,
+    clicks,
+    score,
+  };
 })();
 
 let gameControlModule = (function () {
@@ -41,7 +52,9 @@ let gameControlModule = (function () {
         )
       ) {
         console.log(`Player ${gameBoard.currentPlayer} win!`);
-        gameBoard.board = [[], []];
+        gameBoard.score[gameBoard.currentPlayer] += 1;
+        point[gameBoard.currentPlayer].textContent =
+          gameBoard.score[gameBoard.currentPlayer];
         clear();
       }
     }
@@ -49,8 +62,9 @@ let gameControlModule = (function () {
 
   function clear() {
     box.forEach((el) => (el.textContent = ""));
-    gameBoard.currentPlayer = 0;
+    changePlayer();
     gameBoard.clicks = 0;
+    gameBoard.board = [[], []];
   }
   return { box, winningCondition, checkWin, changePlayer, clear };
 })();
@@ -69,22 +83,19 @@ const playerAction = (function () {
       gameControlModule.box[el.dataset.number].textContent = gameBoard.token;
       gameBoard.board[gameBoard.currentPlayer].push(Number(el.dataset.number));
       console.log(gameBoard.board[gameBoard.currentPlayer]);
+      gameBoard.clicks++;
       gameControlModule.checkWin();
       gameControlModule.changePlayer();
-      gameBoard.clicks++;
       console.log(gameBoard.currentPlayer);
     })
   );
 })();
 
-// const createPlayer = (playerName, playerNumber, playerSymbol) => {
-//   let getPlayerName = () => {
-//     playerName;
-//     console.log(`This is the name of player ${playerNumber}: ${playerName}`);
-//   };
+const createPlayer = (playerName, playerNumber, playerToken) => {
+  players[playerNumber].textContent = playerName;
 
-//   return { getPlayerName, playerName, playerNumber, playerSymbol };
-// };
+  return { playerName, playerNumber, playerToken };
+};
 
-// let igor = createPlayer("Igor", 1, "X");
-// let kinia = createPlayer("Kinia", 2, "O");
+let igor = createPlayer("Igor", 0, "O");
+let kinia = createPlayer("Kinia", 1, "X");
