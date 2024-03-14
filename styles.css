@@ -7,8 +7,29 @@
 .wrapper {
   height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.players {
+  width: 310px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.players .names {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+}
+
+.players .score {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
 }
 
 .grid_container {
