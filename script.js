@@ -1,10 +1,15 @@
 "use strict";
 
 const point = document.querySelectorAll(".point");
-const players = document.querySelectorAll(".player");
+const playerInfo = document.querySelectorAll(".player");
+const submitModal = document.querySelector(".submit_modal");
+
+// GAME BOARD //
 
 const gameBoard = (function () {
   const board = [[], []];
+
+  let players = {};
 
   let score = [0, 0];
 
@@ -19,8 +24,11 @@ const gameBoard = (function () {
     token,
     clicks,
     score,
+    players,
   };
 })();
+
+// GAME LOGIC //
 
 let gameControlModule = (function () {
   const box = document.querySelectorAll(".box");
@@ -45,6 +53,8 @@ let gameControlModule = (function () {
   }
 
   function checkWin() {
+    let isWinner = 0;
+
     for (let i = 0; i < gameControlModule.winningCondition.length; i++) {
       if (
         gameControlModule.winningCondition[i].every((x) =>
@@ -56,7 +66,14 @@ let gameControlModule = (function () {
         point[gameBoard.currentPlayer].textContent =
           gameBoard.score[gameBoard.currentPlayer];
         clear();
+
+        isWinner = 1;
       }
+    }
+
+    if (gameBoard.board.flat(1).length === 9 && isWinner === 0) {
+      console.log("Remis...");
+      clear();
     }
   }
 
@@ -71,6 +88,8 @@ let gameControlModule = (function () {
 
 gameControlModule.clear();
 
+// CLICK EVENTS //
+
 const playerAction = (function () {
   gameControlModule.box.forEach((el) =>
     el.addEventListener("click", function () {
@@ -82,20 +101,46 @@ const playerAction = (function () {
 
       gameControlModule.box[el.dataset.number].textContent = gameBoard.token;
       gameBoard.board[gameBoard.currentPlayer].push(Number(el.dataset.number));
-      console.log(gameBoard.board[gameBoard.currentPlayer]);
+      // console.log(gameBoard.board[gameBoard.currentPlayer]);
       gameBoard.clicks++;
       gameControlModule.checkWin();
       gameControlModule.changePlayer();
-      console.log(gameBoard.currentPlayer);
+      // console.log(gameBoard.currentPlayer);
     })
   );
 })();
 
-const createPlayer = (playerName, playerNumber, playerToken) => {
-  players[playerNumber].textContent = playerName;
+// CREATE PLAYER FUNCTION //
+
+const Player = (playerName, playerNumber, playerToken) => {
+  playerInfo[playerNumber].textContent = playerName;
 
   return { playerName, playerNumber, playerToken };
 };
 
-let igor = createPlayer("Igor", 0, "O");
-let kinia = createPlayer("Kinia", 1, "X");
+submitModal.addEventListener("click", function (e) {
+  e.preventDefault();
+
+  const player1 = document.querySelector("#player1");
+  const player2 = document.querySelector("#player2");
+
+  gameBoard.players.p1 = Player(player1.value, 0, "O");
+  gameBoard.players.p2 = Player(player2.value, 1, "X");
+
+  const modal = document.querySelector(".modal");
+
+  modal.style.setProperty("visibility", "hidden");
+});
+
+const reset = document.querySelector(".reset");
+
+reset.addEventListener("click", function () {
+  gameControlModule.box.forEach((el) => (el.textContent = ""));
+  gameControlModule.clear();
+
+  gameBoard.score = [0, 0];
+  gameBoard.players = {};
+
+  const modal = document.querySelector(".modal");
+  modal.style.setProperty("visibility", "visible");
+});
