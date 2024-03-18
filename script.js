@@ -2,7 +2,10 @@
 
 const point = document.querySelectorAll(".point");
 const playerInfo = document.querySelectorAll(".player");
-const submitModal = document.querySelector(".submit_modal");
+const players = document.querySelector(".players");
+const grid = document.querySelector(".grid_container");
+const reset = document.querySelector(".reset");
+const modal = document.querySelector(".modal");
 
 // GAME BOARD //
 
@@ -20,11 +23,11 @@ const gameBoard = (function () {
 
   return {
     board,
+    players,
+    score,
+    clicks,
     currentPlayer,
     token,
-    clicks,
-    score,
-    players,
   };
 })();
 
@@ -55,16 +58,23 @@ let gameControlModule = (function () {
   function checkWin() {
     let isWinner = 0;
 
+    let playerName =
+      gameBoard.currentPlayer === 0
+        ? gameBoard.players.p1.playerName
+        : gameBoard.players.p2.playerName;
+
     for (let i = 0; i < gameControlModule.winningCondition.length; i++) {
       if (
         gameControlModule.winningCondition[i].every((x) =>
           gameBoard.board[gameBoard.currentPlayer].includes(x)
         )
       ) {
-        console.log(`Player ${gameBoard.currentPlayer} win!`);
+        console.log(`${playerName} win!`);
+
         gameBoard.score[gameBoard.currentPlayer] += 1;
         point[gameBoard.currentPlayer].textContent =
           gameBoard.score[gameBoard.currentPlayer];
+
         clear();
 
         isWinner = 1;
@@ -83,7 +93,7 @@ let gameControlModule = (function () {
     gameBoard.clicks = 0;
     gameBoard.board = [[], []];
   }
-  return { box, winningCondition, checkWin, changePlayer, clear };
+  return { box, winningCondition, changePlayer, checkWin, clear };
 })();
 
 gameControlModule.clear();
@@ -118,7 +128,9 @@ const Player = (playerName, playerNumber, playerToken) => {
   return { playerName, playerNumber, playerToken };
 };
 
-submitModal.addEventListener("click", function (e) {
+// MODAL AND RESET BUTTON ///////
+
+modal.addEventListener("submit", function (e) {
   e.preventDefault();
 
   const player1 = document.querySelector("#player1");
@@ -127,20 +139,28 @@ submitModal.addEventListener("click", function (e) {
   gameBoard.players.p1 = Player(player1.value, 0, "O");
   gameBoard.players.p2 = Player(player2.value, 1, "X");
 
-  const modal = document.querySelector(".modal");
-
   modal.style.setProperty("visibility", "hidden");
+
+  reset.style.setProperty("pointer-events", "all");
+  reset.style.setProperty("filter", "blur(0)");
+  grid.style.setProperty("pointer-events", "all");
+  grid.style.setProperty("filter", "blur(0)");
+  players.style.setProperty("filter", "blur(0)");
 });
 
-const reset = document.querySelector(".reset");
-
 reset.addEventListener("click", function () {
-  gameControlModule.box.forEach((el) => (el.textContent = ""));
   gameControlModule.clear();
 
   gameBoard.score = [0, 0];
   gameBoard.players = {};
 
-  const modal = document.querySelector(".modal");
+  point[0].textContent = point[1].textContent = 0;
+
   modal.style.setProperty("visibility", "visible");
+
+  reset.style.setProperty("pointer-events", "none");
+  reset.style.setProperty("filter", "blur(5px)");
+  grid.style.setProperty("pointer-events", "none");
+  grid.style.setProperty("filter", "blur(5px)");
+  players.style.setProperty("filter", "blur(5px)");
 });
