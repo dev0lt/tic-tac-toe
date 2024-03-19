@@ -14,8 +14,7 @@ const box = document.querySelectorAll(".box");
 // GAME BOARD MODULE //
 
 const gameBoard = (function () {
-  // const board = ["", "", "", "", "", "", "", "", ""];
-  const board = [];
+  let board = [];
 
   let players = {};
 
@@ -117,11 +116,11 @@ const Player = (playerName, playerNumber, playerToken) => {
   return { playerName, playerNumber, playerToken };
 };
 
-// gameControlModule.clear();
-
 // CLICK EVENTS //
 
-const playerAction = (function () {
+const clickEvents = (function () {
+  // CLICK ON BOX //
+
   box.forEach((el) =>
     el.addEventListener("click", function () {
       if (gameBoard.board[Number(el.dataset.number)] !== undefined) return;
@@ -134,34 +133,36 @@ const playerAction = (function () {
       gameControlModule.changePlayer();
     })
   );
+
+  // MODAL //
+
+  modal.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const player1 = document.querySelector("#player1");
+    const player2 = document.querySelector("#player2");
+
+    gameBoard.players.p1 = Player(player1.value, 0, "O");
+    gameBoard.players.p2 = Player(player2.value, 1, "X");
+
+    modal.style.setProperty("visibility", "hidden");
+    modalOverlay.style.setProperty("visibility", "hidden");
+
+    player1.value = player2.value = "";
+  });
+
+  // RESET BUTTON //
+
+  reset.addEventListener("click", function () {
+    gameControlModule.clear();
+
+    gameBoard.score = [0, 0];
+    gameBoard.players = {};
+    gameBoard.board = [];
+
+    point[0].textContent = point[1].textContent = 0;
+
+    modal.style.setProperty("visibility", "visible");
+    modalOverlay.style.setProperty("visibility", "visible");
+  });
 })();
-
-// MODAL AND RESET BUTTON ///////
-
-modal.addEventListener("submit", function (e) {
-  e.preventDefault();
-
-  const player1 = document.querySelector("#player1");
-  const player2 = document.querySelector("#player2");
-
-  gameBoard.players.p1 = Player(player1.value, 0, "O");
-  gameBoard.players.p2 = Player(player2.value, 1, "X");
-
-  modal.style.setProperty("visibility", "hidden");
-  modalOverlay.style.setProperty("visibility", "hidden");
-
-  player1.value = player2.value = "";
-});
-
-reset.addEventListener("click", function () {
-  gameControlModule.clear();
-
-  gameBoard.score = [0, 0];
-  gameBoard.players = {};
-  gameBoard.board = [];
-
-  point[0].textContent = point[1].textContent = 0;
-
-  modal.style.setProperty("visibility", "visible");
-  modalOverlay.style.setProperty("visibility", "visible");
-});
