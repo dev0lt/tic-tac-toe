@@ -1,5 +1,7 @@
 "use strict";
 
+// QUERY SELECTORS //
+
 const point = document.querySelectorAll(".point");
 const playerInfo = document.querySelectorAll(".player");
 const players = document.querySelector(".players");
@@ -9,12 +11,11 @@ const modal = document.querySelector(".modal");
 const modalOverlay = document.querySelector(".modal_overlay");
 const box = document.querySelectorAll(".box");
 
-// GAME BOARD //
+// GAME BOARD MODULE //
 
 const gameBoard = (function () {
-  const board = ["", "", "", "", "", "", "", "", ""];
-
-  const boardByPlayer = [[], []];
+  // const board = ["", "", "", "", "", "", "", "", ""];
+  const board = [];
 
   let players = {};
 
@@ -23,11 +24,11 @@ const gameBoard = (function () {
   let clicks = 0;
 
   let currentPlayer = 0;
+
   let token = "O";
 
   return {
     board,
-    boardByPlayer,
     players,
     score,
     clicks,
@@ -74,8 +75,8 @@ let gameControlModule = (function () {
 
     for (let i = 0; i < gameControlModule.winningCondition.length; i++) {
       if (
-        gameControlModule.winningCondition[i].every((x) =>
-          gameBoard.boardByPlayer[gameBoard.currentPlayer].includes(x)
+        gameControlModule.winningCondition[i].every(
+          (x) => gameBoard.board[x] === gameBoard.token
         )
       ) {
         console.log(`${playerName} win!`);
@@ -90,7 +91,10 @@ let gameControlModule = (function () {
       }
     }
 
-    if (gameBoard.boardByPlayer.flat(1).length === 9 && isWinner === 0) {
+    if (
+      gameBoard.board.filter((x) => x !== undefined).length === 9 &&
+      isWinner === 0
+    ) {
       console.log("Remis...");
       clear();
     }
@@ -100,41 +104,9 @@ let gameControlModule = (function () {
     box.forEach((el) => (el.textContent = ""));
     changePlayer();
     gameBoard.clicks = 0;
-    gameBoard.boardByPlayer = [[], []];
     gameBoard.board = [];
   }
   return { render, winningCondition, changePlayer, checkWin, clear };
-})();
-
-gameControlModule.clear();
-
-// CLICK EVENTS //
-
-const playerAction = (function () {
-  box.forEach((el) =>
-    el.addEventListener("click", function () {
-      if (
-        gameBoard.boardByPlayer[0].includes(Number(el.dataset.number)) ||
-        gameBoard.boardByPlayer[1].includes(Number(el.dataset.number))
-      )
-        return;
-
-      // box[el.dataset.number].textContent = gameBoard.token;
-      gameBoard.boardByPlayer[gameBoard.currentPlayer].push(
-        Number(el.dataset.number)
-      );
-
-      gameBoard.board[el.dataset.number] = gameBoard.token;
-      gameControlModule.render();
-
-      console.log(gameBoard.board);
-      // console.log(gameBoard.boardByPlayer[gameBoard.currentPlayer]);
-      gameBoard.clicks++;
-      gameControlModule.checkWin();
-      gameControlModule.changePlayer();
-      // console.log(gameBoard.currentPlayer);
-    })
-  );
 })();
 
 // CREATE PLAYER FUNCTION //
@@ -144,6 +116,25 @@ const Player = (playerName, playerNumber, playerToken) => {
 
   return { playerName, playerNumber, playerToken };
 };
+
+// gameControlModule.clear();
+
+// CLICK EVENTS //
+
+const playerAction = (function () {
+  box.forEach((el) =>
+    el.addEventListener("click", function () {
+      if (gameBoard.board[Number(el.dataset.number)] !== undefined) return;
+
+      gameBoard.board[el.dataset.number] = gameBoard.token;
+
+      gameControlModule.render();
+      gameBoard.clicks++;
+      gameControlModule.checkWin();
+      gameControlModule.changePlayer();
+    })
+  );
+})();
 
 // MODAL AND RESET BUTTON ///////
 
